@@ -495,7 +495,7 @@
       <div class="header-ctrl-group">
         <div class="status-dashboard">
           <span class="status-item" title="系统授权期限">⏳ 到期时间: <span class="highlight" id="expireDateTxt">检测中...</span></span>
-          <span class="status-item" title="最大容量限制 20MB">💾 云端容量: <span class="highlight" id="storageTxt">0 MB / 20 MB</span></span>
+          <span class="status-item" title="最大容量限制 21MB">💾 云端容量: <span class="highlight" id="storageTxt">0 MB / 21 MB</span></span>
           <button class="btn-renew" onclick="openRenewModal()">⚡ 续费</button>
         </div>
 
@@ -572,7 +572,7 @@
     let previewTimer = null;
 
     /* ==========================================================
-       📖 官方系统默认部署使用手册 HTML 完整源码
+       📖 官方系统默认部署使用手册 HTML 完整源码 (已更新为 21MB)
     ========================================================== */
     const DEFAULT_MANUAL_HTML = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -644,7 +644,7 @@
       <a href="#sec-1" class="toc-btn">1. 初始化与激活</a>
       <a href="#sec-2" class="toc-btn">2. 源码编辑发布</a>
       <a href="#sec-3" class="toc-btn">3. 双端沙盒调试</a>
-      <a href="#sec-4" class="toc-btn">4. 运行时空舱</a>
+      <a href="#sec-4" class="toc-btn">4. 印记托管仓</a>
       <a href="#sec-5" class="toc-btn">5. 配额与保护机制</a>
       <a href="#sec-6" class="toc-btn">6. 常见问题排查</a>
     </nav>
@@ -690,7 +690,7 @@
       </ul>
     </section>
     <section id="sec-4" class="module-card">
-      <div class="module-header"><span class="module-badge">04</span><h2 class="module-title">运行时空舱（资产管理）</h2></div>
+      <div class="module-header"><span class="module-badge">04</span><h2 class="module-title">印记托管仓（资产管理）</h2></div>
       <p style="color: #94a3b8; margin-bottom: 14px;">底部面板实时列出所有已上线的单页资产。支持查看页面私密状态、文件大小、发布日期及执行快速维护：</p>
       <div class="table-responsive">
         <table class="custom-table">
@@ -708,7 +708,7 @@
       <div class="module-header"><span class="module-badge">05</span><h2 class="module-title">配额、时效与安全保护机制</h2></div>
       <p style="color: #94a3b8; margin-bottom: 14px;">系统具备完备的资源配额与到期全局防护逻辑，确保云端资源稳健受控。</p>
       <ul class="content-list">
-        <li><span class="txt-bold">20MB 存储上限阈值</span>：每个站点统一享有 <span class="mark-circle mark-cyan">最高 20MB</span> 的云端持久化存储空间。每次发布新单页时，系统底层将严密校验已存页面总和与新网页大小。若超出 20MB，发布将被拦截并红字提示，需删除冗余网页或联系客服扩容。</li>
+        <li><span class="txt-bold">21MB 存储上限阈值</span>：每个站点统一享有 <span class="mark-circle mark-cyan">最高 21MB</span> 的云端持久化存储空间。每次发布新单页时，系统底层将严密校验已存页面总和与新网页大小。若超出 21MB，发布将被拦截并红字提示，需删除冗余网页释放空间。</li>
         <li><span class="txt-bold">全局到期双向封锁机制</span>：卡密过期后，不仅<strong>管理后台将重新弹起遮罩全面锁定</strong>，所有对外分发的链接（如 <code>/p/xxx</code>）也将同步进入 <span class="mark-circle mark-red">⏳ 专属时空已封存</span> 保护界面，杜绝未授权超时使用。</li>
         <li><span class="txt-bold">数据完整性与续期解封</span>：封存保护期间，您已上传并发布的<strong>网页源码与配置不会被删除</strong>。一旦获取最新有效卡密并重新验证，全站所有对外网页将在数秒内解除封禁，恢复正常访问。</li>
       </ul>
@@ -840,7 +840,7 @@
           const d = new Date(data.expireAt);
           document.getElementById("expireDateTxt").innerText = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
         }
-        document.getElementById("storageTxt").innerText = `${formatBytes(data.usedStorage)} / 20 MB`;
+        document.getElementById("storageTxt").innerText = `${formatBytes(data.usedStorage)} / 21 MB`;
 
         if (!data.licensed) {
           document.getElementById("lockOverlay").classList.remove("hidden");
@@ -930,7 +930,6 @@
         const data = await res.json();
         let pages = data.pages || [];
 
-        // 🌟 核心拦截与静默上架：检查是否已在云端部署使用手册，若无则自动完成首次部署
         const hasManual = pages.some(p => p.slug === "manual");
         if (!hasManual && licenseKey) {
           try {
@@ -985,7 +984,6 @@
     }
 
     async function editPageSource(slug) {
-      // 若回填的是官方手册，秒级从本地缓存还原
       if (slug === "manual") {
         titleInput.value = "印记 · 私密网页高级托管引擎使用手册";
         slugInput.value = "manual";
