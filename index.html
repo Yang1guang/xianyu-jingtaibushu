@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>印记 - 私密网页高级托管引擎</title>
 
@@ -36,6 +36,7 @@
       min-height: 100vh;
       color: var(--text-main);
       padding: 20px 16px 50px;
+      overflow-x: hidden;
     }
 
     .container { max-width: 1440px; margin: 0 auto; position: relative; z-index: 1; }
@@ -58,7 +59,6 @@
       box-shadow: 0 4px 18px rgba(245, 158, 11, 0.25);
     }
 
-    /* 动态旋转黑金光刃边框 */
     .logo-box::before {
       content: "";
       position: absolute;
@@ -81,7 +81,6 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* 纯净暗黑内嵌面板，彻底移除背景杂乱粒子 */
     .logo-inner {
       position: relative;
       z-index: 2;
@@ -111,32 +110,107 @@
     .btn-primary:hover { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* 顶栏控制组与仪表盘 */
-    .header-ctrl-group { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .status-dashboard { display: flex; gap: 18px; font-size: 13px; color: #cbd5e1; background: #1e293b; padding: 8px 18px; border-radius: 99px; border: 1px solid #334155; }
-    .status-dashboard span { display: flex; align-items: center; gap: 6px; }
+    /* 🌟 顶栏胶囊与续费按钮高精度一体化 */
+    .header-ctrl-group {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      max-width: 100%;
+    }
+
+    .status-dashboard {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+      color: #cbd5e1;
+      background: #1e293b;
+      padding: 5px 6px 5px 18px;
+      border-radius: 99px;
+      border: 1px solid #334155;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      box-sizing: border-box;
+    }
+
+    .status-dashboard .status-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
     .highlight { color: #f59e0b; font-weight: bold; }
 
     .btn-renew {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.2));
-      border: 1px solid #f59e0b;
-      color: #fde68a;
-      padding: 7px 16px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border: none;
+      color: #fff;
+      padding: 7px 18px;
       border-radius: 99px;
       font-size: 13px;
       font-weight: 800;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      gap: 5px;
       transition: all 0.2s ease;
-      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.15);
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+      white-space: nowrap;
     }
     .btn-renew:hover {
-      background: var(--primary);
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.45);
       transform: translateY(-1px);
+    }
+
+    /* 📱 针对 iPhone 及移动端的全对称与防溢出排版 */
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+      }
+      .logo-area {
+        justify-content: center;
+        width: 100%;
+      }
+      .header-ctrl-group {
+        width: 100%;
+        justify-content: center;
+      }
+      .status-dashboard {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        border-radius: 18px;
+        padding: 12px 14px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        align-items: center;
+        justify-items: center;
+      }
+      .status-dashboard .status-item {
+        font-size: 12px;
+        gap: 4px;
+        justify-content: center;
+      }
+      .status-dashboard .btn-renew {
+        grid-column: 1 / -1;
+        width: 100%;
+        padding: 10px 0;
+        font-size: 13px;
+        letter-spacing: 1px;
+        border-radius: 12px;
+        box-shadow: 0 3px 12px rgba(245, 158, 11, 0.35);
+      }
+    }
+
+    @media (max-width: 360px) {
+      .status-dashboard .status-item {
+        font-size: 11px;
+      }
     }
 
     .workspace-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 18px; margin-bottom: 24px; }
@@ -176,7 +250,7 @@
     /* 🌟 全屏权限锁定遮罩层 */
     .lock-overlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(20px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.4s; }
     .lock-overlay.hidden { opacity: 0; pointer-events: none; }
-    .lock-card { background: #1e293b; border: 1.5px solid #f59e0b; padding: 40px; border-radius: 24px; text-align: center; width: 90%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+    .lock-card { background: #1e293b; border: 1.5px solid #f59e0b; padding: 40px; border-radius: 24px; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
     .lock-title { font-size: 22px; color: #f8fafc; margin-bottom: 12px; font-weight: 900; letter-spacing: 1px;}
     .lock-desc { font-size: 14px; color: #94a3b8; margin-bottom: 24px; line-height: 1.6;}
     .key-input { width: 100%; padding: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: #fde68a; font-family: monospace; font-size: 15px; text-align: center; outline: none; margin-bottom: 16px; }
@@ -194,7 +268,7 @@
     }
     .renew-modal-card {
       position: relative; background: #1e293b; border: 1.5px solid var(--primary);
-      padding: 30px 24px; border-radius: 24px; text-align: center; width: 90%; max-width: 370px;
+      padding: 30px 24px; border-radius: 24px; text-align: center; width: 90%; max-width: 390px;
       box-shadow: 0 24px 60px rgba(0,0,0,0.8); animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .renew-close-btn {
@@ -210,17 +284,23 @@
 
   <div id="toastMsg" class="toast-msg">✓ 操作成功</div>
 
-  <!-- 🌟 顶栏续费直达二维码弹窗 -->
+  <!-- 🌟 顶栏联系续费与卡密累加弹窗 -->
   <div id="renewModal" class="renew-modal-overlay" onclick="closeRenewModal(event)">
     <div class="renew-modal-card" onclick="event.stopPropagation()">
       <button class="renew-close-btn" onclick="closeRenewModal()">✕</button>
-      <div style="font-size: 38px; margin-bottom: 8px;">💎</div>
-      <h3 style="font-size: 19px; color: #fde68a; margin-bottom: 6px; font-weight: 800;">联系管理员续费 / 扩容</h3>
-      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 18px; line-height: 1.6;">长按或扫码添加管理员微信<br>获取卡密延长使用时间或解锁更多空间</p>
-      <div style="background: #fff; padding: 10px; border-radius: 14px; display: inline-block; box-shadow: 0 6px 24px rgba(0,0,0,0.5);">
-        <img src="/微信二维码.jpg" alt="扫码加微信" onerror="this.src='微信二维码.jpg'" style="width: 220px; height: 220px; object-fit: cover; display: block; border-radius: 8px;">
+      <div style="font-size: 34px; margin-bottom: 6px;">💎</div>
+      <h3 style="font-size: 19px; color: #fde68a; margin-bottom: 4px; font-weight: 800;">时空授权续费</h3>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">扫码联系管理员获取新卡密，或在下方直接充值续费</p>
+      
+      <div style="background: #fff; padding: 8px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+        <img src="/微信二维码.jpg" alt="微信二维码" onerror="this.src='微信二维码.jpg'" style="width: 180px; height: 180px; object-fit: cover; display: block; border-radius: 6px;">
       </div>
-      <div style="margin-top: 14px; font-size: 12px; color: #64748b;">支持 7天 / 30天 / 90天 / 180天 / 365天 灵活定制</div>
+
+      <div style="margin-top: 18px; text-align: left;">
+        <input type="text" id="renewKeyInput" class="key-input" placeholder="输入续费卡密: YJ-XXX-XXX..." style="margin-bottom: 10px;" autocomplete="off">
+        <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="submitRenewKey()">⚡ 立即累加使用时长</button>
+      </div>
+      <div style="margin-top: 10px; font-size: 12px; color: #64748b;">支持在原有剩余天数上叠加延长时长</div>
     </div>
   </div>
 
@@ -256,12 +336,13 @@
         </div>
       </div>
 
+      <!-- 🌟 优雅内嵌续费按钮的胶囊仪表盘 -->
       <div class="header-ctrl-group">
         <div class="status-dashboard">
-          <span title="系统授权期限">⏳ 到期时间: <span class="highlight" id="expireDateTxt">检测中...</span></span>
-          <span title="最大容量限制 20MB">💾 云端容量: <span class="highlight" id="storageTxt">0 MB / 20 MB</span></span>
+          <span class="status-item" title="系统授权期限">⏳ 到期时间: <span class="highlight" id="expireDateTxt">检测中...</span></span>
+          <span class="status-item" title="最大容量限制 20MB">💾 云端容量: <span class="highlight" id="storageTxt">0 MB / 20 MB</span></span>
+          <button class="btn-renew" onclick="openRenewModal()">⚡ 续费</button>
         </div>
-        <button class="btn-renew" onclick="openRenewModal()">⚡ 联系管理员续费</button>
       </div>
     </header>
 
@@ -375,6 +456,7 @@
 
     function openRenewModal() {
       document.getElementById("renewModal").style.display = "flex";
+      document.getElementById("renewKeyInput").value = "";
     }
 
     function closeRenewModal(e) {
@@ -393,7 +475,7 @@
         }
         document.getElementById("storageTxt").innerText = `${formatBytes(data.usedStorage)} / 20 MB`;
 
-        if (!data.licensed || !licenseKey) {
+        if (!data.licensed) {
           document.getElementById("lockOverlay").classList.remove("hidden");
         } else {
           document.getElementById("lockOverlay").classList.add("hidden");
@@ -404,6 +486,7 @@
       }
     }
 
+    // 首次激活卡密
     async function activateLicense() {
       const key = document.getElementById("licenseKeyInput").value.trim();
       if (!key) return showToast("请输入卡密", true);
@@ -415,16 +498,36 @@
         if (data.valid) {
           licenseKey = key;
           localStorage.setItem(AUTH_STORAGE_KEY, key);
-          showToast("✨ 激活成功！印记时空已为您解锁");
+          showToast(`✨ 激活成功！已增加 ${data.addedDays} 天使用时长`);
           checkSystemStatus();
         } else {
-          showToast(data.error || "卡密无效或已到期", true);
+          showToast(data.error || "卡密无效或已核销", true);
+        }
+      } catch (e) { showToast("网络异常", true); }
+    }
+
+    // 顶栏随时录入新卡密叠加上帝视角时长
+    async function submitRenewKey() {
+      const key = document.getElementById("renewKeyInput").value.trim();
+      if (!key) return showToast("请输入续费卡密", true);
+      try {
+        const res = await fetch("/api/auth/verify", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key })
+        });
+        const data = await res.json();
+        if (data.valid) {
+          licenseKey = key;
+          localStorage.setItem(AUTH_STORAGE_KEY, key);
+          showToast(`🎉 续费成功！时长已向后叠加 ${data.addedDays} 天`);
+          closeRenewModal();
+          checkSystemStatus();
+        } else {
+          showToast(data.error || "续费失败：卡密无效或已使用", true);
         }
       } catch (e) { showToast("网络异常", true); }
     }
 
     async function publishPage() {
-      if (!licenseKey) return document.getElementById("lockOverlay").classList.remove("hidden");
       const html = codeEditor.value;
       if (!html.trim()) return showToast("源码不能为空！", true);
 
@@ -440,8 +543,7 @@
         const data = await res.json();
 
         if (res.status === 401) {
-          localStorage.removeItem(AUTH_STORAGE_KEY); licenseKey = "";
-          checkSystemStatus(); return showToast("授权已失效，请重新激活", true);
+          checkSystemStatus(); return showToast("授权已失效，请重新激活续期", true);
         }
         if (data.error) return showToast(data.error, true);
 
@@ -454,7 +556,6 @@
     }
 
     async function loadPageList() {
-      if (!licenseKey) return;
       try {
         const res = await fetch("/api/page/list", { headers: { "x-license-key": licenseKey } });
         if (res.status === 401) return;
