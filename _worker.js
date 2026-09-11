@@ -38,7 +38,6 @@ export default {
       const timestamp = parseInt(parts[2], 10);
       const sig = parts[3];
 
-      // 卡密自生成起拥有 1 年的未兑换货架期
       const maxRedeemWindow = timestamp + (365 * 24 * 60 * 60 * 1000);
       if (Date.now() > maxRedeemWindow) return null;
 
@@ -53,7 +52,6 @@ export default {
       return { days, timestamp };
     }
 
-    // 读取全局授权与核销记录
     async function getSystemLicenseRecord() {
       if (!bucket) return { licensed: false, expireAt: 0, usedKeys: [] };
       try {
@@ -140,7 +138,6 @@ export default {
        🛠️ 2. API 接口区
     ========================================================== */
     try {
-      // 🌟 核心：激活或续费卡密（支持自动向后累加时间 + 防重复核销）
       if (url.pathname === "/api/auth/verify" && request.method === "POST") {
         if (!bucket) return jsonResponse({ valid: false, error: "未绑定存储空间" }, 500);
         const { key } = await request.json();
@@ -152,7 +149,6 @@ export default {
           return jsonResponse({ valid: false, error: "❌ 该卡密已被核销使用，无法重复充值！" }, 400);
         }
 
-        // 计算叠加时间：若当前未过期，在原剩余时间后累加；若已过期，从当下时间后累加
         const baseTimestamp = (currentRec.expireAt > Date.now()) ? currentRec.expireAt : Date.now();
         const addedDuration = validData.days * 24 * 60 * 60 * 1000;
         const newExpireAt = baseTimestamp + addedDuration;
@@ -161,7 +157,7 @@ export default {
         await bucket.put("_config/license.json", JSON.stringify({
           expireAt: newExpireAt,
           lastActiveKey: key,
-          usedKeys: updatedUsedKeys.slice(-200) // 保留最近 200 张核销记录
+          usedKeys: updatedUsedKeys.slice(-200)
         }));
 
         return jsonResponse({
@@ -171,9 +167,9 @@ export default {
         });
       }
 
-      // 获取系统状态与用量
+      // 获取系统状态与用量 (已更新为 21MB)
       if (url.pathname === "/api/system/status" && request.method === "GET") {
-        if (!bucket) return jsonResponse({ licensed: false, expireAt: 0, usedStorage: 0, maxStorage: 20 * 1024 * 1024, error: "未绑定存储空间" });
+        if (!bucket) return jsonResponse({ licensed: false, expireAt: 0, usedStorage: 0, maxStorage: 21 * 1024 * 1024, error: "未绑定存储空间" });
         const record = await getSystemLicenseRecord();
         let usedBytes = 0;
         try {
@@ -185,11 +181,10 @@ export default {
           licensed: record.licensed,
           expireAt: record.expireAt,
           usedStorage: usedBytes,
-          maxStorage: 20 * 1024 * 1024
+          maxStorage: 21 * 1024 * 1024
         });
       }
 
-      // 验证当前操作者的卡密有效性
       const currentRec = await getSystemLicenseRecord();
       if (url.pathname.startsWith("/api/page/")) {
         if (!bucket) return jsonResponse({ error: "存储空间未绑定" }, 500);
@@ -232,14 +227,15 @@ export default {
           let cleanSlug = (slug || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
           if (!cleanSlug) cleanSlug = "p" + Math.random().toString(36).substring(2, 7);
 
+          // 🌟 核心拦截：计算 21MB 存储上限
           const listed = await bucket.list({ prefix: "_pages/" });
           let totalSize = 0;
           for (const obj of listed.objects) {
             if (obj.key !== `_pages/${cleanSlug}.html`) totalSize += obj.size;
           }
           const newSize = new TextEncoder().encode(html).length;
-          if (totalSize + newSize > 20 * 1024 * 1024) {
-            return jsonResponse({ error: "云端存储空间已达 20MB 上限，请删除旧网页释放空间！" }, 403);
+          if (totalSize + newSize > 21 * 1024 * 1024) {
+            return jsonResponse({ error: "云端存储空间已达 21MB 上限，请删除旧网页释放空间！" }, 403);
           }
 
           if (!title || !title.trim()) title = extractTitleFromHtml(html);
