@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>印记 - 私密网页高级托管引擎</title>
+
+  <style>
+    :root {
+      --primary: #f59e0b;
+      --primary-hover: #d97706;
+      --bg-dark: #020617;
+      --card-bg: rgba(15, 23, 42, 0.88);
+      --card-border: rgba(245, 158, 11, 0.4);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.3); border-radius: 4px; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-dark);
+      background-image: radial-gradient(circle at top right, rgba(245,158,11,0.1), transparent 40%), radial-gradient(circle at bottom left, rgba(217,119,6,0.1), transparent 40%);
+      min-height: 100vh;
+      color: var(--text-main);
+      padding: 20px 16px 50px;
+    }
+
+    .container { max-width: 1440px; margin: 0 auto; position: relative; z-index: 1; }
+
+    /* 🌟 高奢黑金印记 Logo */
+    .header {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 16px; padding-bottom: 16px; margin-bottom: 18px; border-bottom: 1px dashed rgba(245, 158, 11, 0.35);
+    }
+    .logo-area { display: flex; align-items: center; gap: 16px; }
+    .logo-box {
+      position: relative; background: #0f172a; border: 2px solid #f59e0b; padding: 6px 18px;
+      border-radius: 12px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3), inset 0 2px 5px rgba(255, 255, 255, 0.1);
+      overflow: hidden; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .logo-particles {
+      position: absolute; inset: 0; opacity: 0.7; animation: drift 12s linear infinite;
+      background-image: radial-gradient(circle at 20% 30%, #fde68a 1px, transparent 1px), radial-gradient(circle at 80% 40%, #f59e0b 1.5px, transparent 1.5px), radial-gradient(circle at 40% 70%, #d97706 1px, transparent 1px), radial-gradient(circle at 70% 80%, #fffbeb 2px, transparent 2px);
+      background-size: 24px 24px;
+    }
+    @keyframes drift { from { background-position: 0 0; } to { background-position: 24px 24px; } }
+    .logo-text {
+      font-size: 26px; font-weight: 900; letter-spacing: 4px; position: relative; z-index: 2;
+      background: linear-gradient(135deg, #fde68a 0%, #f59e0b 50%, #d97706 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .header-desc { font-size: 13px; color: var(--text-sub); }
+
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 800; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; transition: 0.2s; outline: none; }
+    .btn:hover { border-color: var(--primary); background: rgba(245, 158, 11, 0.1); }
+    .btn-primary { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25); }
+    .btn-primary:hover { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* 仪表盘 */
+    .status-dashboard { display: flex; gap: 20px; font-size: 13px; color: #cbd5e1; background: #1e293b; padding: 8px 16px; border-radius: 99px; border: 1px solid #334155; }
+    .status-dashboard span { display: flex; align-items: center; gap: 6px; }
+    .highlight { color: #f59e0b; font-weight: bold; }
+
+    .workspace-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 18px; margin-bottom: 24px; }
+    @media (max-width: 992px) { .workspace-grid { grid-template-columns: 1fr; } }
+
+    .panel-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 18px; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; height: 680px; }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed rgba(255,255,255,0.1); }
+    .panel-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+
+    .config-grid { display: grid; grid-template-columns: 1.4fr 1.2fr 1fr; gap: 8px; margin-bottom: 10px; }
+    @media (max-width: 640px) { .config-grid { grid-template-columns: 1fr; } }
+    .input-field { padding: 10px 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; font-size: 13px; background: rgba(0,0,0,0.3); color: #fff; outline: none; }
+    .input-field:focus { border-color: var(--primary); }
+
+    .code-editor { flex: 1; width: 100%; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; font-family: monospace; font-size: 13px; line-height: 1.6; background: #020617; color: #38bdf8; outline: none; resize: none; }
+
+    .preview-container { flex: 1; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.4); border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
+    .preview-iframe { width: 100%; height: 100%; border: none; background: #fff; transition: width 0.25s ease; }
+    .preview-iframe.mobile-mode { width: 375px; height: 600px; border-radius: 24px; border: 6px solid #1f2937; }
+
+    /* 卡片列表 */
+    .assets-section { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; }
+    .page-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 16px;}
+    .page-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; transition: 0.2s; }
+    .page-card:hover { border-color: var(--primary); background: rgba(245, 158, 11, 0.05); }
+    .page-card-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: #fde68a; }
+    .page-card-slug { font-size: 12px; color: #94a3b8; font-family: monospace; }
+    .page-card-meta { font-size: 12px; color: #64748b; margin-top: 12px; display: flex; justify-content: space-between; }
+    .page-card-actions { display: flex; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); }
+    .action-btn { flex: 1; padding: 6px 0; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,0.1); background: transparent; cursor: pointer; color: #cbd5e1; transition: 0.2s; text-align: center; text-decoration: none; }
+    .action-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+    .toast-msg { position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(15, 23, 42, 0.95); color: #fff; padding: 12px 24px; border-radius: 24px; font-size: 14px; font-weight: 800; border: 1px solid var(--primary); box-shadow: 0 8px 30px rgba(0,0,0,0.6); z-index: 10000; opacity: 0; pointer-events: none; transition: 0.3s; }
+    .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast-msg.error { border-color: #ef4444; color: #fecaca; }
+
+    /* 🌟 全屏权限锁定遮罩层 */
+    .lock-overlay { position: fixed; inset: 0; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(20px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.4s; }
+    .lock-overlay.hidden { opacity: 0; pointer-events: none; }
+    .lock-card { background: #1e293b; border: 1.5px solid #f59e0b; padding: 40px; border-radius: 24px; text-align: center; width: 90%; max-width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+    .lock-title { font-size: 22px; color: #f8fafc; margin-bottom: 12px; font-weight: 900; letter-spacing: 1px;}
+    .lock-desc { font-size: 14px; color: #94a3b8; margin-bottom: 24px; line-height: 1.6;}
+    .key-input { width: 100%; padding: 14px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: #fde68a; font-family: monospace; font-size: 15px; text-align: center; outline: none; margin-bottom: 16px; }
+    .key-input:focus { border-color: #f59e0b; }
+    .lock-actions { display: flex; gap: 12px; }
+    
+    /* 微信二维码弹窗 */
+    #wxModal { display: none; margin-top: 20px; animation: slideDown 0.3s; }
+    #wxModal img { width: 100%; max-width: 220px; border-radius: 12px; border: 4px solid #fff; }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <div id="toastMsg" class="toast-msg">✓ 操作成功</div>
+
+  <!-- 🌟 系统权限与到期锁定遮罩 -->
+  <div class="lock-overlay" id="lockOverlay">
+    <div class="lock-card">
+      <div style="font-size: 48px; margin-bottom: 16px;">🔐</div>
+      <h2 class="lock-title">印记时空未激活或已到期</h2>
+      <p class="lock-desc">核心编辑权限已被锁定。<br>请输入授权卡密激活系统，或联系客服获取最新卡密。</p>
+      <input type="text" id="licenseKeyInput" class="key-input" placeholder="输入卡密: YJ-XXX-XXX..." autocomplete="off">
+      <div class="lock-actions">
+        <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="activateLicense()">🔑 立即验证激活</button>
+        <button class="btn" style="flex: 1; justify-content: center;" onclick="toggleWxModal()">💬 微信咨询获取</button>
+      </div>
+      <div id="wxModal">
+        <img src="/微信二维码.jpg" alt="扫码加微信获取卡密" onerror="this.src='微信二维码.jpg'">
+        <p style="font-size:12px; color:#cbd5e1; margin-top:8px;">长按或扫码添加客服获取卡密</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header class="header">
+      <div class="logo-area">
+        <div class="logo-box">
+          <div class="logo-particles"></div>
+          <div class="logo-text">印记</div>
+        </div>
+        <div>
+          <div class="header-desc" style="color: #cbd5e1; font-weight: bold; font-size: 14px; margin-top:0;">高阶私密单页托管引擎</div>
+        </div>
+      </div>
+
+      <div class="status-dashboard">
+        <span title="系统授权期限">⏳ 到期时间: <span class="highlight" id="expireDateTxt">检测中...</span></span>
+        <span title="最大容量限制 20MB">💾 云端容量: <span class="highlight" id="storageTxt">0 MB / 20 MB</span></span>
+      </div>
+    </header>
+
+    <div class="workspace-grid">
+      <!-- 左栏：源码与配置 -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <span class="panel-title">📄 网页源码与配置</span>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn" onclick="document.getElementById('fileUpload').click()">📁 导入文件</button>
+            <button class="btn" onclick="clearEditor()">🗑️ 清空</button>
+            <input type="file" id="fileUpload" accept=".html,.htm" style="display:none;" onchange="handleFileImport(event)" />
+          </div>
+        </div>
+
+        <div class="config-grid">
+          <input type="text" id="pageTitleInput" class="input-field" placeholder="页面标题（留空自动抓取）" />
+          <input type="text" id="pageSlugInput" class="input-field" placeholder="短链后缀（如: love，留空随机）" />
+          <input type="password" id="pagePasswordInput" class="input-field" placeholder="访问密码（可选）" />
+        </div>
+
+        <textarea id="htmlCodeEditor" class="code-editor" placeholder="在此粘贴完整的 HTML 代码，或直接拖拽 .html 文件至此处..."></textarea>
+
+        <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <span id="codeSizeTip" style="font-size: 12px; color: var(--text-sub);">当前代码：0 B</span>
+          <button id="publishBtn" class="btn btn-primary" style="padding: 10px 24px; font-size: 14px;" onclick="publishPage()">🚀 立即发布并生成链接</button>
+        </div>
+      </div>
+
+      <!-- 右栏：沙盒实时调试 -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <span class="panel-title">👁️ 沙盒实时预览</span>
+          <div style="display: flex; gap: 6px;">
+            <button id="viewPcBtn" class="btn btn-primary" onclick="setPreviewMode('pc')">💻 电脑模式</button>
+            <button id="viewMobileBtn" class="btn" onclick="setPreviewMode('mobile')">📱 手机模式</button>
+            <button class="btn" onclick="refreshPreview()">🔄 刷新视图</button>
+          </div>
+        </div>
+
+        <div class="preview-container">
+          <iframe id="previewIframe" class="preview-iframe" sandbox="allow-scripts allow-modals allow-same-origin allow-forms"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部资产库 -->
+    <div class="assets-section">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 16px; font-weight: 700; color: #f8fafc;">📦 运行时空舱 (<span id="pageCount">0</span>)</span>
+        <button class="btn" onclick="loadPageList()">🔄 刷新列表</button>
+      </div>
+      <div class="page-grid" id="pageGrid"></div>
+    </div>
+  </div>
+
+  <script>
+    const AUTH_STORAGE_KEY = "YINJI_LICENSE_KEY";
+    let licenseKey = localStorage.getItem(AUTH_STORAGE_KEY) || "";
+
+    const titleInput = document.getElementById("pageTitleInput");
+    const slugInput = document.getElementById("pageSlugInput");
+    const pwdInput = document.getElementById("pagePasswordInput");
+    const codeEditor = document.getElementById("htmlCodeEditor");
+    const previewIframe = document.getElementById("previewIframe");
+    const sizeTip = document.getElementById("codeSizeTip");
+    const publishBtn = document.getElementById("publishBtn");
+    let previewTimer = null;
+
+    function autoDetectTitle(html) {
+      if (!html) return "";
+      const match = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+      return match ? match[1].trim() : "";
+    }
+
+    codeEditor.addEventListener("input", () => {
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(() => {
+        const code = codeEditor.value;
+        previewIframe.srcdoc = code.trim() ? code : "<div style='display:flex;height:100vh;align-items:center;justify-content:center;color:#94a3b8;'>等待输入源码...</div>";
+        if (!titleInput.value.trim() && autoDetectTitle(code)) titleInput.value = autoDetectTitle(code);
+      }, 400);
+      sizeTip.innerText = `当前代码：${formatBytes(new Blob([codeEditor.value]).size)}`;
+    });
+
+    function refreshPreview() { previewIframe.srcdoc = codeEditor.value; showToast("视图已刷新"); }
+    function setPreviewMode(mode) {
+      const pcBtn = document.getElementById("viewPcBtn"), mobileBtn = document.getElementById("viewMobileBtn");
+      if (mode === "mobile") { previewIframe.classList.add("mobile-mode"); mobileBtn.classList.add("btn-primary"); pcBtn.classList.remove("btn-primary"); }
+      else { previewIframe.classList.remove("mobile-mode"); pcBtn.classList.add("btn-primary"); mobileBtn.classList.remove("btn-primary"); }
+    }
+
+    function handleFileImport(e) {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        codeEditor.value = evt.target.result;
+        titleInput.value = autoDetectTitle(codeEditor.value) || file.name.replace(/\.[^/.]+$/, "");
+        slugInput.value = file.name.replace(/\.[^/.]+$/, "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
+        refreshPreview();
+        sizeTip.innerText = `当前代码：${formatBytes(new Blob([codeEditor.value]).size)}`;
+        showToast("✓ 源码导入成功");
+      };
+      reader.readAsText(file);
+    }
+
+    function toggleWxModal() {
+      const wx = document.getElementById("wxModal");
+      wx.style.display = wx.style.display === "block" ? "none" : "block";
+    }
+
+    async function checkSystemStatus() {
+      try {
+        const res = await fetch("/api/system/status");
+        const data = await res.json();
+        
+        // 更新顶栏数据
+        if (data.expireAt) {
+          const d = new Date(data.expireAt);
+          document.getElementById("expireDateTxt").innerText = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+        }
+        document.getElementById("storageTxt").innerText = `${formatBytes(data.usedStorage)} / 20 MB`;
+
+        // 如果云端判定已到期，或者本地没有存卡密，则封锁 UI
+        if (!data.licensed || !licenseKey) {
+          document.getElementById("lockOverlay").classList.remove("hidden");
+        } else {
+          document.getElementById("lockOverlay").classList.add("hidden");
+          loadPageList();
+        }
+      } catch (err) {
+        showToast("状态检测异常，请刷新", true);
+      }
+    }
+
+    async function activateLicense() {
+      const key = document.getElementById("licenseKeyInput").value.trim();
+      if (!key) return showToast("请输入卡密", true);
+      try {
+        const res = await fetch("/api/auth/verify", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key })
+        });
+        const data = await res.json();
+        if (data.valid) {
+          licenseKey = key;
+          localStorage.setItem(AUTH_STORAGE_KEY, key);
+          showToast("✨ 激活成功！印记时空已为您解锁");
+          checkSystemStatus();
+        } else {
+          showToast(data.error || "卡密无效或已到期", true);
+        }
+      } catch (e) { showToast("网络异常", true); }
+    }
+
+    async function publishPage() {
+      if (!licenseKey) return document.getElementById("lockOverlay").classList.remove("hidden");
+      const html = codeEditor.value;
+      if (!html.trim()) return showToast("源码不能为空！", true);
+
+      publishBtn.disabled = true; publishBtn.innerHTML = "⏳ 部署中...";
+      try {
+        const payload = {
+          title: titleInput.value.trim() || autoDetectTitle(html) || slugInput.value.trim() || "未命名网页",
+          slug: slugInput.value.trim(), html, password: pwdInput.value.trim()
+        };
+        const res = await fetch("/api/page/publish", {
+          method: "POST", headers: { "Content-Type": "application/json", "x-license-key": licenseKey }, body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.status === 401) {
+          localStorage.removeItem(AUTH_STORAGE_KEY); licenseKey = "";
+          checkSystemStatus(); return showToast("授权已失效，请重新激活", true);
+        }
+        if (data.error) return showToast(data.error, true);
+
+        showToast("🚀 专属网页已成功发布上线！");
+        checkSystemStatus(); // 刷新容量
+        loadPageList();
+        setTimeout(() => { if (confirm(`发布成功！\n链接：${window.location.origin}/p/${data.slug}\n\n是否立即访问？`)) window.open(`/p/${data.slug}`, "_blank"); }, 300);
+      } catch (err) { showToast("异常：" + err.message, true); }
+      finally { publishBtn.disabled = false; publishBtn.innerHTML = "🚀 立即发布并生成链接"; }
+    }
+
+    async function loadPageList() {
+      if (!licenseKey) return;
+      try {
+        const res = await fetch("/api/page/list", { headers: { "x-license-key": licenseKey } });
+        if (res.status === 401) return;
+        const data = await res.json();
+        renderPageList(data.pages || []);
+      } catch (_) {}
+    }
+
+    function renderPageList(pages) {
+      const grid = document.getElementById("pageGrid");
+      document.getElementById("pageCount").innerText = pages.length;
+      grid.innerHTML = "";
+      if (pages.length === 0) return grid.innerHTML = "<div style='grid-column: 1 / -1; text-align:center; padding: 40px; color:#64748b;'>时空舱空空如也，在上方发布您的第一个回忆吧。</div>";
+      pages.forEach(p => {
+        const card = document.createElement("div"); card.className = "page-card";
+        const pageUrl = `${window.location.origin}/p/${p.slug}`;
+        card.innerHTML = `
+          <div><div class="page-card-title">${escapeHtml(p.title)}</div><div class="page-card-slug">/p/${p.slug} ${p.hasPassword ? '🔒私密' : '🌐公开'}</div></div>
+          <div>
+            <div class="page-card-meta"><span>${formatBytes(p.size)}</span><span>${p.date}</span></div>
+            <div class="page-card-actions">
+              <button class="action-btn" onclick="copyText('${pageUrl}')">🔗 提取</button>
+              <button class="action-btn" onclick="editPageSource('${p.slug}')">✏️ 修改</button>
+              <a href="${pageUrl}" target="_blank" class="action-btn">👁️ 访问</a>
+              <button class="action-btn" style="color:#ef4444;" onclick="deletePage('${p.slug}')">🗑️ 摧毁</button>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    async function editPageSource(slug) {
+      try {
+        const res = await fetch(`/api/page/get?slug=${encodeURIComponent(slug)}`, { headers: { "x-license-key": licenseKey } });
+        if (res.ok) {
+          const data = await res.json();
+          titleInput.value = data.title; slugInput.value = data.slug; pwdInput.value = data.password; codeEditor.value = data.html;
+          refreshPreview(); window.scrollTo({ top: 0, behavior: 'smooth' }); showToast("✓ 源码已回填，可覆写更新");
+        }
+      } catch (err) {}
+    }
+
+    async function deletePage(slug) {
+      if (!confirm(`确定要彻底摧毁单页 /p/${slug} 吗？数据不可恢复！`)) return;
+      try {
+        const res = await fetch("/api/page/delete", { method: "POST", headers: { "Content-Type": "application/json", "x-license-key": licenseKey }, body: JSON.stringify({ slug }) });
+        if (res.ok) { showToast("已成功摧毁释放空间"); loadPageList(); checkSystemStatus(); }
+      } catch (_) {}
+    }
+
+    function copyText(text) { navigator.clipboard.writeText(text); showToast("✓ 链接已复制"); }
+    function clearEditor() { if (confirm("确定要清空编辑框吗？")) { titleInput.value = ""; slugInput.value = ""; pwdInput.value = ""; codeEditor.value = ""; refreshPreview(); sizeTip.innerText = "当前代码：0 B"; } }
+
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById("toastMsg"); toast.innerText = msg;
+      if (isError) toast.classList.add("error"); else toast.classList.remove("error");
+      toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 2500);
+    }
+    function escapeHtml(str) { return (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    function formatBytes(bytes) { if (!bytes || bytes === 0) return '0 B'; const k = 1024, sizes = ['B', 'KB', 'MB']; const i = Math.floor(Math.log(bytes) / Math.log(k)); return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i]; }
+
+    // 初始化：优先检查状态拦截
+    checkSystemStatus();
+  </script>
+</body>
+</html>
