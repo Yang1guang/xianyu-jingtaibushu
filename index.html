@@ -6,21 +6,71 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>印记 - 私密网页高级托管引擎</title>
 
-  <!-- 🌟 仓库已上传的网页图标标准调用 -->
+  <!-- 🌟 仓库已上传的网页图标标准调用[cite: 3] -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
   <style>
+    /* 🌟 暗金深色主题变量（默认） */
     :root {
       --primary: #f59e0b;
       --primary-hover: #d97706;
-      --bg-dark: #020617;
+      --bg-main: #020617;
+      --bg-gradient: radial-gradient(circle at top right, rgba(245,158,11,0.1), transparent 40%), radial-gradient(circle at bottom left, rgba(217,119,6,0.1), transparent 40%), #020617;
       --card-bg: rgba(15, 23, 42, 0.88);
       --card-border: rgba(245, 158, 11, 0.4);
       --text-main: #f8fafc;
       --text-sub: #94a3b8;
+      --panel-border-dashed: rgba(255, 255, 255, 0.1);
+      --input-bg: rgba(0, 0, 0, 0.3);
+      --input-border: rgba(255, 255, 255, 0.1);
+      --input-color: #ffffff;
+      --btn-bg: rgba(255, 255, 255, 0.05);
+      --btn-border: rgba(255, 255, 255, 0.1);
+      --btn-color: #ffffff;
+      --dashboard-bg: #1e293b;
+      --dashboard-border: #334155;
+      --dashboard-color: #cbd5e1;
+      --page-card-bg: rgba(0, 0, 0, 0.3);
+      --page-card-title: #fde68a;
+      --action-btn-color: #cbd5e1;
+      --action-btn-border: rgba(255, 255, 255, 0.1);
+      --action-btn-bg: transparent;
+      --logo-inner-bg: #090e1a;
+      --preview-bg: rgba(0, 0, 0, 0.4);
+      --shadow-color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* 🌟 浅太阳暖金渐变主题 */
+    body.theme-light {
+      --primary: #f59e0b;
+      --primary-hover: #d97706;
+      --bg-main: #fffbeb;
+      --bg-gradient: radial-gradient(circle at top right, rgba(245,158,11,0.18), transparent 45%), radial-gradient(circle at bottom left, rgba(217,119,6,0.12), transparent 45%), linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fde68a 100%);
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --card-border: rgba(245, 158, 11, 0.35);
+      --text-main: #1f2937;
+      --text-sub: #6b7280;
+      --panel-border-dashed: rgba(245, 158, 11, 0.25);
+      --input-bg: #ffffff;
+      --input-border: rgba(0, 0, 0, 0.12);
+      --input-color: #1f2937;
+      --btn-bg: #ffffff;
+      --btn-border: rgba(0, 0, 0, 0.1);
+      --btn-color: #1f2937;
+      --dashboard-bg: rgba(255, 255, 255, 0.92);
+      --dashboard-border: rgba(245, 158, 11, 0.38);
+      --dashboard-color: #4b5563;
+      --page-card-bg: #ffffff;
+      --page-card-title: #b45309;
+      --action-btn-color: #4b5563;
+      --action-btn-border: rgba(0, 0, 0, 0.08);
+      --action-btn-bg: #f8fafc;
+      --logo-inner-bg: #ffffff;
+      --preview-bg: rgba(241, 245, 249, 0.7);
+      --shadow-color: rgba(245, 158, 11, 0.12);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,12 +81,14 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg-dark);
-      background-image: radial-gradient(circle at top right, rgba(245,158,11,0.1), transparent 40%), radial-gradient(circle at bottom left, rgba(217,119,6,0.1), transparent 40%);
+      background: var(--bg-main);
+      background-image: var(--bg-gradient);
+      background-attachment: fixed;
       min-height: 100vh;
       color: var(--text-main);
       padding: 20px 16px 50px;
       overflow-x: hidden;
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
     .container { max-width: 1440px; margin: 0 auto; position: relative; z-index: 1; }
@@ -84,12 +136,13 @@
     .logo-inner {
       position: relative;
       z-index: 2;
-      background: #090e1a;
+      background: var(--logo-inner-bg);
       padding: 6px 20px;
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background 0.3s ease;
     }
 
     .logo-text {
@@ -102,19 +155,20 @@
       color: transparent;
     }
 
-    .header-desc { font-size: 13px; color: var(--text-sub); }
+    .header-desc { font-size: 13px; color: var(--text-sub); transition: color 0.3s ease; }
 
-    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 800; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; transition: 0.2s; outline: none; text-decoration: none; }
-    .btn:hover { border-color: var(--primary); background: rgba(245, 158, 11, 0.1); }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 800; cursor: pointer; border: 1px solid var(--btn-border); background: var(--btn-bg); color: var(--btn-color); transition: all 0.2s; outline: none; text-decoration: none; }
+    .btn:hover { border-color: var(--primary); background: rgba(245, 158, 11, 0.12); }
     .btn-primary { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25); }
     .btn-primary:hover { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* 🌟 顶栏胶囊与续费按钮高精度一体化 */
+    /* 🌟 顶栏控制组与双主题切换按钮 */
     .header-ctrl-group {
       display: flex;
       align-items: center;
       justify-content: flex-end;
+      gap: 12px;
       max-width: 100%;
     }
 
@@ -123,13 +177,14 @@
       align-items: center;
       gap: 16px;
       font-size: 13px;
-      color: #cbd5e1;
-      background: #1e293b;
+      color: var(--dashboard-color);
+      background: var(--dashboard-bg);
       padding: 5px 6px 5px 18px;
       border-radius: 99px;
-      border: 1px solid #334155;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--dashboard-border);
+      box-shadow: 0 4px 15px var(--shadow-color);
       box-sizing: border-box;
+      transition: all 0.3s ease;
     }
 
     .status-dashboard .status-item {
@@ -164,7 +219,31 @@
       transform: translateY(-1px);
     }
 
-    /* 📱 针对 iPhone 及移动端的全对称与防溢出排版 */
+    /* 主题模式切换小按钮 */
+    .btn-theme-toggle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--dashboard-border);
+      background: var(--dashboard-bg);
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 8px var(--shadow-color);
+      flex-shrink: 0;
+      outline: none;
+    }
+    .btn-theme-toggle:hover {
+      transform: rotate(20deg) scale(1.08);
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+    }
+
+    /* 📱 移动端与苹果手机自适应对称排版 */
     @media (max-width: 768px) {
       .header {
         flex-direction: column;
@@ -178,11 +257,12 @@
       .header-ctrl-group {
         width: 100%;
         justify-content: center;
+        gap: 8px;
       }
       .status-dashboard {
-        width: 100%;
-        max-width: 400px;
-        margin: 0 auto;
+        width: calc(100% - 46px);
+        max-width: 360px;
+        margin: 0;
         border-radius: 18px;
         padding: 12px 14px;
         display: grid;
@@ -205,43 +285,118 @@
         border-radius: 12px;
         box-shadow: 0 3px 12px rgba(245, 158, 11, 0.35);
       }
+      .btn-theme-toggle {
+        width: 38px;
+        height: 38px;
+        align-self: center;
+      }
     }
 
     @media (max-width: 360px) {
-      .status-dashboard .status-item {
-        font-size: 11px;
-      }
+      .status-dashboard .status-item { font-size: 11px; }
     }
 
     .workspace-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 18px; margin-bottom: 24px; }
     @media (max-width: 992px) { .workspace-grid { grid-template-columns: 1fr; } }
 
-    .panel-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 18px; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; height: 680px; }
-    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed rgba(255,255,255,0.1); }
+    .panel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px var(--shadow-color);
+      display: flex;
+      flex-direction: column;
+      height: 680px;
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px dashed var(--panel-border-dashed); }
     .panel-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
 
     .config-grid { display: grid; grid-template-columns: 1.4fr 1.2fr 1fr; gap: 8px; margin-bottom: 10px; }
     @media (max-width: 640px) { .config-grid { grid-template-columns: 1fr; } }
-    .input-field { padding: 10px 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; font-size: 13px; background: rgba(0,0,0,0.3); color: #fff; outline: none; }
+    .input-field {
+      padding: 10px 12px;
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      font-size: 13px;
+      background: var(--input-bg);
+      color: var(--input-color);
+      outline: none;
+      transition: all 0.2s ease;
+    }
     .input-field:focus { border-color: var(--primary); }
 
-    .code-editor { flex: 1; width: 100%; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 14px; font-family: monospace; font-size: 13px; line-height: 1.6; background: #020617; color: #38bdf8; outline: none; resize: none; }
+    .code-editor {
+      flex: 1;
+      width: 100%;
+      border: 1px solid var(--input-border);
+      border-radius: 12px;
+      padding: 14px;
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      background: #020617;
+      color: #38bdf8;
+      outline: none;
+      resize: none;
+    }
 
-    .preview-container { flex: 1; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.4); border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; }
+    .preview-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--preview-bg);
+      border-radius: 14px;
+      border: 1px solid var(--panel-border-dashed);
+      overflow: hidden;
+      transition: background 0.3s ease;
+    }
     .preview-iframe { width: 100%; height: 100%; border: none; background: #fff; transition: width 0.25s ease; }
     .preview-iframe.mobile-mode { width: 375px; height: 600px; border-radius: 24px; border: 6px solid #1f2937; }
 
     /* 卡片列表 */
-    .assets-section { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 20px; }
+    .assets-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 30px var(--shadow-color);
+      transition: all 0.3s ease;
+    }
     .page-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 16px;}
-    .page-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; transition: 0.2s; }
-    .page-card:hover { border-color: var(--primary); background: rgba(245, 158, 11, 0.05); }
-    .page-card-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: #fde68a; }
-    .page-card-slug { font-size: 12px; color: #94a3b8; font-family: monospace; }
-    .page-card-meta { font-size: 12px; color: #64748b; margin-top: 12px; display: flex; justify-content: space-between; }
-    .page-card-actions { display: flex; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); }
-    .action-btn { flex: 1; padding: 6px 0; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid rgba(255,255,255,0.1); background: transparent; cursor: pointer; color: #cbd5e1; transition: 0.2s; text-align: center; text-decoration: none; }
-    .action-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .page-card {
+      background: var(--page-card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: 0.2s;
+    }
+    .page-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .page-card-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: var(--page-card-title); }
+    .page-card-slug { font-size: 12px; color: var(--text-sub); font-family: monospace; }
+    .page-card-meta { font-size: 12px; color: var(--text-sub); margin-top: 12px; display: flex; justify-content: space-between; }
+    .page-card-actions { display: flex; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--panel-border-dashed); }
+    .action-btn {
+      flex: 1;
+      padding: 6px 0;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--action-btn-border);
+      background: var(--action-btn-bg);
+      cursor: pointer;
+      color: var(--action-btn-color);
+      transition: 0.2s;
+      text-align: center;
+      text-decoration: none;
+    }
+    .action-btn:hover { background: rgba(245, 158, 11, 0.15); color: var(--primary-hover); border-color: var(--primary); }
 
     .toast-msg { position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-20px); background: rgba(15, 23, 42, 0.95); color: #fff; padding: 12px 24px; border-radius: 24px; font-size: 14px; font-weight: 800; border: 1px solid var(--primary); box-shadow: 0 8px 30px rgba(0,0,0,0.6); z-index: 10000; opacity: 0; pointer-events: none; transition: 0.3s; }
     .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -332,17 +487,20 @@
           </div>
         </div>
         <div>
-          <div class="header-desc" style="color: #cbd5e1; font-weight: bold; font-size: 14px; margin-top:0;">高阶私密单页托管引擎</div>
+          <div class="header-desc" style="font-weight: bold; font-size: 14px; margin-top:0;">高阶私密单页托管引擎</div>
         </div>
       </div>
 
-      <!-- 🌟 优雅内嵌续费按钮的胶囊仪表盘 -->
+      <!-- 🌟 顶栏控制组：胶囊仪表盘 + 明暗主题切换小按钮 -->
       <div class="header-ctrl-group">
         <div class="status-dashboard">
           <span class="status-item" title="系统授权期限">⏳ 到期时间: <span class="highlight" id="expireDateTxt">检测中...</span></span>
           <span class="status-item" title="最大容量限制 20MB">💾 云端容量: <span class="highlight" id="storageTxt">0 MB / 20 MB</span></span>
           <button class="btn-renew" onclick="openRenewModal()">⚡ 续费</button>
         </div>
+
+        <!-- 🌓 深浅主题快速切换按钮 -->
+        <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()" title="切换深色/浅太阳主题">☀️</button>
       </div>
     </header>
 
@@ -392,7 +550,7 @@
     <!-- 底部资产库 -->
     <div class="assets-section">
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 16px; font-weight: 700; color: #f8fafc;">📦 运行时空舱 (<span id="pageCount">0</span>)</span>
+        <span style="font-size: 16px; font-weight: 700;">📦 运行时空舱 (<span id="pageCount">0</span>)</span>
         <button class="btn" onclick="loadPageList()">🔄 刷新列表</button>
       </div>
       <div class="page-grid" id="pageGrid"></div>
@@ -401,6 +559,7 @@
 
   <script>
     const AUTH_STORAGE_KEY = "YINJI_LICENSE_KEY";
+    const THEME_STORAGE_KEY = "YINJI_THEME_MODE";
     let licenseKey = localStorage.getItem(AUTH_STORAGE_KEY) || "";
 
     const titleInput = document.getElementById("pageTitleInput");
@@ -412,6 +571,40 @@
     const publishBtn = document.getElementById("publishBtn");
     let previewTimer = null;
 
+    /* ==========================================================
+       🌓 1. 深浅主题切换控制逻辑
+    ========================================================== */
+    function applyTheme(theme) {
+      const btn = document.getElementById("themeToggleBtn");
+      if (theme === "light") {
+        document.body.classList.add("theme-light");
+        if (btn) {
+          btn.innerHTML = "🌙";
+          btn.title = "当前：浅太阳主题，点击切换为暗金主题";
+        }
+      } else {
+        document.body.classList.remove("theme-light");
+        if (btn) {
+          btn.innerHTML = "☀️";
+          btn.title = "当前：暗金主题，点击切换为浅太阳主题";
+        }
+      }
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    }
+
+    function toggleTheme() {
+      const isLight = document.body.classList.contains("theme-light");
+      const nextTheme = isLight ? "dark" : "light";
+      applyTheme(nextTheme);
+      showToast(nextTheme === "light" ? "☀️ 已切换为浅太阳主题" : "🌙 已切换为暗金深色主题");
+    }
+
+    // 初始化时加载保存的主题偏好（默认深色）
+    applyTheme(localStorage.getItem(THEME_STORAGE_KEY) || "dark");
+
+    /* ==========================================================
+       🛠️ 2. 编辑器与沙盒逻辑
+    ========================================================== */
     function autoDetectTitle(html) {
       if (!html) return "";
       const match = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
@@ -464,6 +657,9 @@
       document.getElementById("renewModal").style.display = "none";
     }
 
+    /* ==========================================================
+       🔒 3. 授权、续费与状态侦测
+    ========================================================== */
     async function checkSystemStatus() {
       try {
         const res = await fetch("/api/system/status");
@@ -486,7 +682,6 @@
       }
     }
 
-    // 首次激活卡密
     async function activateLicense() {
       const key = document.getElementById("licenseKeyInput").value.trim();
       if (!key) return showToast("请输入卡密", true);
@@ -506,7 +701,6 @@
       } catch (e) { showToast("网络异常", true); }
     }
 
-    // 顶栏随时录入新卡密叠加上帝视角时长
     async function submitRenewKey() {
       const key = document.getElementById("renewKeyInput").value.trim();
       if (!key) return showToast("请输入续费卡密", true);
@@ -568,7 +762,7 @@
       const grid = document.getElementById("pageGrid");
       document.getElementById("pageCount").innerText = pages.length;
       grid.innerHTML = "";
-      if (pages.length === 0) return grid.innerHTML = "<div style='grid-column: 1 / -1; text-align:center; padding: 40px; color:#64748b;'>时空舱空空如也，在上方发布您的第一个回忆吧。</div>";
+      if (pages.length === 0) return grid.innerHTML = "<div style='grid-column: 1 / -1; text-align:center; padding: 40px; color:var(--text-sub);'>时空舱空空如也，在上方发布您的第一个回忆吧。</div>";
       pages.forEach(p => {
         const card = document.createElement("div"); card.className = "page-card";
         const pageUrl = `${window.location.origin}/p/${p.slug}`;
