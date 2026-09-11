@@ -2,10 +2,15 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // 1. 自动绑定 R2 存储桶
+    // 1. 精确绑定 R2 存储桶，彻底排除 ASSETS 代理对象误抓
     let bucket = env.BUCKET || env.MY_BUCKET || env.R2 || env.R2_BUCKET || env.PAN || env.FILES || env.FILE_BUCKET;
     if (!bucket) {
-      bucket = Object.values(env).find(v => v && typeof v.list === 'function' && typeof v.get === 'function');
+      for (const [k, v] of Object.entries(env)) {
+        if (k !== "ASSETS" && v && typeof v.list === "function" && typeof v.get === "function") {
+          bucket = v;
+          break;
+        }
+      }
     }
 
     const corsHeaders = {
@@ -21,7 +26,7 @@ export default {
       return new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" } });
     }
 
-    // 🌟 卡密核心加密校验算法 (HMAC-SHA256)
+    // 🌟 卡密校验算法 (HMAC-SHA256)
     const SECRET_KEY = env.LICENSE_SECRET || "YINJI_SECRET_888";
     
     async function verifyLicenseKey(key) {
@@ -34,7 +39,7 @@ export default {
       const sig = parts[3];
 
       const expireAt = timestamp + days * 24 * 60 * 60 * 1000;
-      if (Date.now() > expireAt) return null; // 卡密本身已到期
+      if (Date.now() > expireAt) return null;
 
       const encoder = new TextEncoder();
       const data = encoder.encode(`${days}-${timestamp}`);
@@ -47,13 +52,16 @@ export default {
       return { expireAt, days };
     }
 
-    // 获取当前系统的到期状态
     async function getSystemLicenseStatus() {
-      if (!bucket) return { licensed: false, expireAt: 0 };
-      const configObj = await bucket.get("_config/license.json");
-      if (!configObj) return { licensed: false, expireAt: 0 };
-      const data = JSON.parse(await configObj.text());
-      return { licensed: Date.now() < data.expireAt, expireAt: data.expireAt };
+      if (!bucket) return { licensed: false, expireAt: 0, noBucket: true };
+      try {
+        const configObj = await bucket.get("_config/license.json");
+        if (!configObj) return { licensed: false, expireAt: 0 };
+        const data = JSON.parse(await configObj.text());
+        return { licensed: Date.now() < data.expireAt, expireAt: data.expireAt };
+      } catch (_) {
+        return { licensed: false, expireAt: 0 };
+      }
     }
 
     function extractTitleFromHtml(html) {
@@ -63,13 +71,12 @@ export default {
     }
 
     /* ==========================================================
-       🌐 1. 公开短链单页访问 (/p/:slug) - 拦截到期
+       🌐 1. 公开短链单页访问 (/p/:slug)
     ========================================================== */
     if (url.pathname.startsWith("/p/")) {
       const rawSlug = url.pathname.slice(3).replace(/\/+$/, "").trim();
       if (!rawSlug || !bucket) return new Response("Page Not Found", { status: 404 });
 
-      // 🌟 核心：查验系统是否到期
       const sysStatus = await getSystemLicenseStatus();
       if (!sysStatus.licensed) {
         return new Response(`
@@ -103,7 +110,6 @@ export default {
 
       const slug = rawSlug.toLowerCase();
       const object = await bucket.get(`_pages/${slug}.html`);
-
       if (!object) return new Response("Page Not Found", { status: 404 });
 
       const pageMeta = object.customMetadata || {};
@@ -127,40 +133,42 @@ export default {
        🛠️ 2. API 接口区
     ========================================================== */
     try {
-      // 激活/登录授权
       if (url.pathname === "/api/auth/verify" && request.method === "POST") {
-        if (!bucket) return jsonResponse({ error: "Storage Unbound" }, 500);
+        if (!bucket) {
+          return jsonResponse({ valid: false, error: "未在 CF 后台绑定 R2 存储桶，变量名须为 BUCKET" }, 500);
+        }
         const { key } = await request.json();
         const validData = await verifyLicenseKey(key);
         if (!validData) return jsonResponse({ valid: false, error: "卡密无效或已过期" }, 401);
         
-        // 激活成功，记录到期时间至全局
         await bucket.put("_config/license.json", JSON.stringify({ expireAt: validData.expireAt, activeKey: key }));
         return jsonResponse({ valid: true, expireAt: validData.expireAt });
       }
 
-      // 获取系统状态与容量 (最大 20MB)
       if (url.pathname === "/api/system/status" && request.method === "GET") {
-        if (!bucket) return jsonResponse({ error: "Storage Unbound" }, 500);
+        if (!bucket) {
+          return jsonResponse({ licensed: false, expireAt: 0, usedStorage: 0, maxStorage: 20 * 1024 * 1024, error: "未绑定存储空间" });
+        }
         const status = await getSystemLicenseStatus();
-        
-        const listed = await bucket.list({ prefix: "_pages/" });
         let usedBytes = 0;
-        for (const obj of listed.objects) usedBytes += obj.size;
+        try {
+          const listed = await bucket.list({ prefix: "_pages/" });
+          for (const obj of (listed.objects || [])) usedBytes += obj.size;
+        } catch (_) {}
 
         return jsonResponse({
           licensed: status.licensed,
           expireAt: status.expireAt,
           usedStorage: usedBytes,
-          maxStorage: 20 * 1024 * 1024 // 20 MB
+          maxStorage: 20 * 1024 * 1024
         });
       }
 
-      // 以下接口全部进行卡密强校验
       const authKey = request.headers.get("x-license-key");
       const authData = await verifyLicenseKey(authKey);
 
       if (url.pathname.startsWith("/api/page/")) {
+        if (!bucket) return jsonResponse({ error: "存储空间未绑定" }, 500);
         if (!authData) return jsonResponse({ error: "无操作权限，请先验证有效卡密" }, 401);
 
         if (url.pathname === "/api/page/list" && request.method === "GET") {
@@ -198,15 +206,14 @@ export default {
           let cleanSlug = (slug || "").trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
           if (!cleanSlug) cleanSlug = "p" + Math.random().toString(36).substring(2, 7);
 
-          // 🌟 核心拦截：计算 20MB 存储上限
           const listed = await bucket.list({ prefix: "_pages/" });
           let totalSize = 0;
-          for (const obj of listed.objects) {
+          for (const obj of (listed.objects || [])) {
             if (obj.key !== `_pages/${cleanSlug}.html`) totalSize += obj.size;
           }
           const newSize = new TextEncoder().encode(html).length;
           if (totalSize + newSize > 20 * 1024 * 1024) {
-            return jsonResponse({ error: "云端存储空间已达 20MB 上限，请删除旧网页或联系微信客服扩容！" }, 403);
+            return jsonResponse({ error: "云端存储空间已达 20MB 上限，请删除旧网页或联系客服扩容！" }, 403);
           }
 
           if (!title || !title.trim()) title = extractTitleFromHtml(html);
@@ -215,7 +222,6 @@ export default {
           if (password && password.trim()) customMetadata.password = password.trim();
 
           await bucket.put(`_pages/${cleanSlug}.html`, html, { httpMetadata: { contentType: "text/html; charset=utf-8" }, customMetadata });
-          // 更新有效期保障
           await bucket.put("_config/license.json", JSON.stringify({ expireAt: authData.expireAt, activeKey: authKey }));
 
           return jsonResponse({ success: true, slug: cleanSlug, title: finalTitle, url: `/p/${cleanSlug}` });
@@ -229,7 +235,6 @@ export default {
         }
       }
 
-      // 🌟 核心修复：仅拦截以 /api/ 开头的错误请求，防止拦截静态文件
       if (url.pathname.startsWith("/api/")) {
         return jsonResponse({ error: "API Route Not Found" }, 404);
       }
@@ -238,7 +243,6 @@ export default {
       return jsonResponse({ error: err.message || "服务器处理异常" }, 500);
     }
 
-    // 将普通静态请求交由 Cloudflare Pages 处理（如 /index.html）
     return env.ASSETS ? env.ASSETS.fetch(request) : new Response("Not Found", { status: 404 });
   }
 };
