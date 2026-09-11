@@ -2,6 +2,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    // 1. 自动绑定 R2 存储桶
     let bucket = env.BUCKET || env.MY_BUCKET || env.R2 || env.R2_BUCKET || env.PAN || env.FILES || env.FILE_BUCKET;
     if (!bucket) {
       bucket = Object.values(env).find(v => v && typeof v.list === 'function' && typeof v.get === 'function');
@@ -228,9 +229,16 @@ export default {
         }
       }
 
-      return jsonResponse({ error: "API Route Not Found" }, 404);
+      // 🌟 核心修复：仅拦截以 /api/ 开头的错误请求，防止拦截静态文件
+      if (url.pathname.startsWith("/api/")) {
+        return jsonResponse({ error: "API Route Not Found" }, 404);
+      }
+      
     } catch (err) {
       return jsonResponse({ error: err.message || "服务器处理异常" }, 500);
     }
+
+    // 将普通静态请求交由 Cloudflare Pages 处理（如 /index.html）
+    return env.ASSETS ? env.ASSETS.fetch(request) : new Response("Not Found", { status: 404 });
   }
 };
