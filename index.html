@@ -6,7 +6,7 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>印记 - 私密网页高级托管引擎</title>
 
-  <!-- 🌟 仓库已上传的网页图标标准调用[cite: 3] -->
+  <!-- 🌟 仓库已上传的网页图标标准调用 -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
@@ -413,7 +413,6 @@
     .lock-actions { display: flex; gap: 12px; }
     
     #wxModal { display: none; margin-top: 20px; animation: slideDown 0.3s; }
-    #wxModal img { width: 100%; max-width: 220px; border-radius: 12px; border: 4px solid #fff; }
     @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
     /* 🌟 续费弹窗 */
@@ -445,11 +444,12 @@
       <button class="renew-close-btn" onclick="closeRenewModal()">✕</button>
       <div style="font-size: 34px; margin-bottom: 6px;">💎</div>
       <h3 style="font-size: 19px; color: #fde68a; margin-bottom: 4px; font-weight: 800;">时空授权续费</h3>
-      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">扫码联系管理员获取新卡密，或在下方直接充值续费</p>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">联系站长邮箱获取新卡密，或在下方直接充值续费</p>
       
-      <div style="background: #fff; padding: 8px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
-        <img src="/微信二维码.jpg" alt="微信二维码" onerror="this.src='微信二维码.jpg'" style="width: 180px; height: 180px; object-fit: cover; display: block; border-radius: 6px;">
-      </div>
+      <!-- 替换后的邮箱链接按钮 -->
+      <a href="mailto:yg@3927521.xyz" style="display: block; background: rgba(255,255,255,0.05); border: 1px dashed #f59e0b; padding: 16px; border-radius: 14px; color: #fde68a; font-size: 18px; font-weight: bold; text-decoration: none; margin: 0 auto 20px; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        yg@3927521.xyz
+      </a>
 
       <div style="margin-top: 18px; text-align: left;">
         <input type="text" id="renewKeyInput" class="key-input" placeholder="输入续费卡密: YJ-XXX-XXX..." style="margin-bottom: 10px;" autocomplete="off">
@@ -468,11 +468,14 @@
       <input type="text" id="licenseKeyInput" class="key-input" placeholder="输入卡密: YJ-XXX-XXX..." autocomplete="off">
       <div class="lock-actions">
         <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="activateLicense()">🔑 立即验证激活</button>
-        <button class="btn" style="flex: 1; justify-content: center;" onclick="toggleWxModal()">💬 微信咨询获取</button>
+        <button class="btn" style="flex: 1; justify-content: center;" onclick="toggleWxModal()">📧 邮件咨询获取</button>
       </div>
       <div id="wxModal">
-        <img src="/微信二维码.jpg" alt="扫码加微信获取卡密" onerror="this.src='微信二维码.jpg'">
-        <p style="font-size:12px; color:#cbd5e1; margin-top:8px;">长按或扫码添加客服获取卡密</p>
+        <!-- 替换后的邮箱链接按钮 -->
+        <a href="mailto:yg@3927521.xyz" style="display: block; background: rgba(0,0,0,0.3); border: 1px dashed #f59e0b; padding: 15px; border-radius: 12px; color: #fde68a; font-size: 17px; font-weight: bold; text-decoration: none; margin-top: 5px; transition: all 0.3s;">
+          yg@3927521.xyz
+        </a>
+        <p style="font-size:12px; color:#cbd5e1; margin-top:10px;">点击上方邮箱地址即可直接发送邮件</p>
       </div>
     </div>
   </div>
